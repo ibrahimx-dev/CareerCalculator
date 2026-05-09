@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Career Calculator | Discover Your Path</title>
+    <meta name="description" content="Discover your ideal career path using our intelligent AI-powered calculator based on your unique skills and interests.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary-gradient: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #60a5fa;
+            --error-color: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        /* Ambient Background Orbs */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: float 20s infinite ease-in-out alternate;
+        }
+        
+        .orb-1 {
+            width: 300px;
+            height: 300px;
+            background: rgba(59, 130, 246, 0.3);
+            top: 10%;
+            left: 20%;
+        }
+
+        .orb-2 {
+            width: 400px;
+            height: 400px;
+            background: rgba(139, 92, 246, 0.2);
+            bottom: 10%;
+            right: 15%;
+            animation-delay: -5s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -50px) scale(1.1); }
+            100% { transform: translate(-20px, 20px) scale(0.9); }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 10;
+        }
+
+        @keyframes slideUp {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.95rem;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            transition: color 0.3s;
+        }
+
+        .form-group:focus-within label {
+            color: var(--accent-color);
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: rgba(96, 165, 250, 0.5);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .form-control::placeholder {
+            color: rgba(148, 163, 184, 0.4);
+        }
+
+        .btn-submit {
+            width: 100%;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 18px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 16px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Results Section */
+        #results-container {
+            margin-top: 32px;
+            display: none;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .career-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .career-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .career-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .career-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(5px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .career-card:hover::before {
+            opacity: 1;
+        }
+
+        .career-icon {
+            font-size: 1.5rem;
+            margin-right: 16px;
+            background: rgba(59, 130, 246, 0.1);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+        }
+
+        .career-name {
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 24px;
+            display: none;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .container { padding: 32px 24px; }
+            .header h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <main class="container">
+        <div class="header">
+            <h1>Career Calculator</h1>
+            <p>Enter your top skills and interests to discover your ideal career matches, powered by our recommendation engine.</p>
+        </div>
+
+        <form id="career-form">
+            <div class="form-group">
+                <label for="skill">Primary Skill</label>
+                <input type="text" id="skill" class="form-control" placeholder="e.g., Programming, Design, Writing..." required autocomplete="off">
+            </div>
+
+            <div class="form-group">
+                <label for="interest">Core Interest</label>
+                <input type="text" id="interest" class="form-control" placeholder="e.g., Problem Solving, Creativity..." required autocomplete="off">
+            </div>
+
+            <button type="submit" class="btn-submit" id="submit-btn">
+                <span>Discover Careers</span>
+                <div class="spinner" id="spinner"></div>
+            </button>
+        </form>
+
+        <div id="error-box" class="error-message"></div>
+
+        <div id="results-container">
+            <div class="results-header">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="url(#gradient)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#3b82f6" />
+                            <stop offset="100%" stop-color="#8b5cf6" />
+                        </linearGradient>
+                    </defs>
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                </svg>
+                Top Recommended Careers
+            </div>
+            <ul class="career-list" id="career-list">
+                <!-- Results populated dynamically -->
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        const form = document.getElementById('career-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const btnText = submitBtn.querySelector('span');
+        const spinner = document.getElementById('spinner');
+        const resultsContainer = document.getElementById('results-container');
+        const careerList = document.getElementById('career-list');
+        const errorBox = document.getElementById('error-box');
+
+        // Simple mapping of keywords to emojis for visual flair
+        const emojiMap = {
+            'developer': '💻', 'engineer': '⚙️', 'designer': '🎨', 'writer': '✍️',
+            'manager': '📊', 'administrator': '🖥️', 'analyst': '📈', 'teacher': '👨‍🏫',
+            'marketer': '🚀', 'animator': '🎬', 'counselor': '🧠', 'lawyer': '⚖️',
+            'doctor': '🩺', 'accountant': '📒', 'security': '🔒', 'sales': '🤝',
+            'music': '🎵', 'author': '📚', 'scientist': '🔬'
+        };
+
+        function getEmojiForCareer(career) {
+            const lowerC = career.toLowerCase();
+            for (const [key, emoji] of Object.entries(emojiMap)) {
+                if (lowerC.includes(key)) return emoji;
+            }
+            return '💼'; // Default briefcase
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const skill = document.getElementById('skill').value.trim();
+            const interest = document.getElementById('interest').value.trim();
+            
+            if (!skill || !interest) return;
+
+            // UI Loading state
+            btnText.textContent = 'Analyzing...';
+            spinner.style.display = 'block';
+            submitBtn.disabled = true;
+            resultsContainer.style.display = 'none';
+            errorBox.style.display = 'none';
+            careerList.innerHTML = '';
+
+            try {
+                // Fetch from the local API endpoint
+                const url = `/api/recommend?skill=${encodeURIComponent(skill)}&interest=${encodeURIComponent(interest)}`;
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                
+                const careers = await response.json();
+                
+                if (careers.length === 0) {
+                    careerList.innerHTML = `
+                        <div class="no-results">
+                            <p>No exact match found in our database.</p>
+                            <p style="font-size: 0.9em; margin-top: 8px; color: #64748b;">Try adjusting your skills or interests.</p>
+                        </div>
+                    `;
+                } else {
+                    // Populate results with staggered animation
+                    careers.forEach((career, index) => {
+                        const li = document.createElement('li');
+                        li.className = 'career-card';
+                        li.style.animation = `fadeIn 0.5s ease forwards ${index * 0.1}s`;
+                        li.style.opacity = '0';
+                        
+                        li.innerHTML = `
+                            <div class="career-icon">${getEmojiForCareer(career)}</div>
+                            <div class="career-name">${career}</div>
+                        `;
+                        careerList.appendChild(li);
+                    });
+                }
+                
+                resultsContainer.style.display = 'block';
+                
+            } catch (error) {
+                console.error("Error fetching careers:", error);
+                errorBox.textContent = 'Oops! Could not connect to the recommendation engine. Is the server running?';
+                errorBox.style.display = 'block';
+            } finally {
+                // Reset UI
+                btnText.textContent = 'Discover Careers';
+                spinner.style.display = 'none';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
